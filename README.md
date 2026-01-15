@@ -28,26 +28,3 @@ Run the interactive CLI:
 python main.py
 ```
 
-The CLI provides:
-- Interactive questioning of your database
-- Database inspection capabilities
-- Natural language queries converted to SQL
-
-### Available Commands
-
-- **Ask questions**: Type any natural language question about your data
-- **inspect**: Show database information and available tables
-- **help**: Display help message
-- **quit/exit/q**: Exit the application
-
-### Example Questions
-
-- "Which genre on average has the longest tracks?"
-- "Show me the top 5 customers by total purchase amount"
-- "How many albums does each artist have?"
-
-## Architecture
-
-- `sql_agent.py`: Contains the `SQLAgent` class with all business logic (requires `db_uri` and `model_name` parameters)
-- `main.py`: Interactive CLI that imports and uses the SQLAgent class
-- Environment variables are loaded in `main.py`, keeping business logic separate from application setup
