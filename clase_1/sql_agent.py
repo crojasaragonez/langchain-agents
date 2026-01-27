@@ -2,11 +2,12 @@ from langchain.chat_models import init_chat_model
 from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from langchain.agents import create_agent
-from langchain_core.chat_history import InMemoryChatMessageHistory
+from langchain_community.chat_message_histories import FileChatMessageHistory
+from pathlib import Path
 
 class SQLAgent:
 
-  def __init__(self, db_uri, model_name, top_k=5):
+  def __init__(self, db_uri, model_name, top_k=5, history_path=None):
     self.db_uri     = db_uri
     self.model_name = model_name
     self.top_k      = top_k
@@ -16,7 +17,8 @@ class SQLAgent:
     self.toolkit = None
     self.tools = None
     self.agent = None
-    self.memory = InMemoryChatMessageHistory()
+    history_file = history_path or (Path(__file__).parent / "chat_history.json")
+    self.memory = FileChatMessageHistory(str(history_file))
     self._setup()
 
   def _setup(self):
