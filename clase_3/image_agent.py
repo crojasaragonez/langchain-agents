@@ -2,8 +2,8 @@ from langchain.chat_models import init_chat_model
 from langchain.agents import create_agent
 from langchain_core.chat_history import InMemoryChatMessageHistory
 from langchain.tools import tool
-from langchain_core.messages import HumanMessage
 import requests
+import base64
 import os
 from pathlib import Path
 from datetime import datetime
@@ -46,34 +46,20 @@ Make it appropriate for the music genre while being fresh and contemporary.
 Do NOT recreate any existing album cover - create an original new design."""
 
       try:
-        # Generate image using the model's image generation capability
-        response = self.model.invoke([
-          HumanMessage(
-            content=[
-              {
-                "type": "text",
-                "text": f"Generate an image with this description: {prompt}"
-              }
-            ]
-          )
-        ])
-
-        # For DALL-E integration through OpenAI
+        # Use OpenAI's DALL-E for image generation
         from openai import OpenAI
         client = OpenAI()
 
         image_response = client.images.generate(
           model=self.image_model,
           prompt=prompt,
-          size="1024x1024",
-          quality="auto",
+          size="auto",
+          quality="low",
           n=1,
         )
 
-        image_url = image_response.data[0].url
 
-        # Download and save the image
-        image_data = requests.get(image_url).content
+        image_base64 = image_response.data[0].b64_json
 
         # Create filename
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -82,9 +68,9 @@ Do NOT recreate any existing album cover - create an original new design."""
         filename = f"{safe_artist}_{safe_album}_{style}_{timestamp}.png"
         filepath = self.output_dir / filename
 
-        # Save the image
-        with open(filepath, 'wb') as f:
-          f.write(image_data)
+        # Download and save the image
+        with open(filepath, "wb") as f:
+            f.write(base64.b64decode(image_base64))
 
         return f"Album cover saved successfully to: {filepath}"
 
